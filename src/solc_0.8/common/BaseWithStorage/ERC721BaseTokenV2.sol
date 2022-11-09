@@ -9,8 +9,9 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol"
 import "./WithSuperOperatorsV2.sol";
 import "../interfaces/IERC721MandatoryTokenReceiver.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+import {DefaultOperatorFilterer} from "../opensea/DefaultOperatorFilterer.sol";
 
-contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperOperatorsV2 {
+contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperOperatorsV2, DefaultOperatorFilterer {
     using AddressUpgradeable for address;
 
     bytes4 internal constant _ERC721_RECEIVED = 0x150b7a02;
@@ -74,7 +75,7 @@ contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperO
         address from,
         address to,
         uint256 id
-    ) external override {
+    ) external override onlyAllowedOperator {
         _checkTransfer(from, to, id);
         _transferFrom(from, to, id);
         if (to.isContract() && _checkInterfaceWith10000Gas(to, ERC721_MANDATORY_RECEIVER)) {
@@ -90,7 +91,7 @@ contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperO
         address from,
         address to,
         uint256 id
-    ) external override {
+    ) external override onlyAllowedOperator {
         safeTransferFrom(from, to, id, "");
     }
 
@@ -104,7 +105,7 @@ contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperO
         address to,
         uint256[] calldata ids,
         bytes calldata data
-    ) public virtual {
+    ) public virtual onlyAllowedOperator {
         _batchTransferFrom(from, to, ids, data, false);
     }
 
@@ -119,7 +120,7 @@ contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperO
         address to,
         uint256[] calldata ids,
         bytes calldata data
-    ) external {
+    ) external onlyAllowedOperator {
         _batchTransferFrom(from, to, ids, data, true);
     }
 
@@ -216,7 +217,7 @@ contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperO
         address to,
         uint256 id,
         bytes memory data
-    ) public override {
+    ) public override onlyAllowedOperator {
         _checkTransfer(from, to, id);
         _transferFrom(from, to, id);
         if (to.isContract()) {
@@ -344,7 +345,8 @@ contract ERC721BaseTokenV2 is ContextUpgradeable, IERC721Upgradeable, WithSuperO
     ) internal {
         require(from == owner, "NOT_OWNER");
         uint256 storageId = _storageId(id);
-        _owners[storageId] = (_owners[storageId] & NOT_OPERATOR_FLAG) | BURNED_FLAG; // record as non owner but keep track of last owner
+        _owners[storageId] = (_owners[storageId] & NOT_OPERATOR_FLAG) | BURNED_FLAG;
+        // record as non owner but keep track of last owner
         _numNFTPerAddress[from]--;
         emit Transfer(from, address(0), id);
     }
