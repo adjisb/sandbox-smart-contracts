@@ -9,9 +9,10 @@ export function extractFromId(
   numFTTypes: number;
 } {
   const bn = BigNumber.from(tokenID);
+
   return {
-    packID: bn.shr(23).mod(bn2.pow(32)).toNumber(),
+    packID: bn.shr(23).mod(bn2.pow(32)).toNumber(), // packId length 40 bits
     creator: bn.shr(96).toHexString(),
-    numFTTypes: bn.shr(11).mod(bn2.pow(12)).toNumber(),
+    numFTTypes: bn.shr(11).mod(bn2.pow(12)).toNumber(), // numFTs length 12 bits
   };
 }
