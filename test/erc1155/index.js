@@ -687,6 +687,9 @@ module.exports = (init) => {
         deployments,
         receiverAddress,
         assetContractAsBouncerAdmin,
+        tokenIdsForCreatorEarning,
+        assetERC1155,
+        assetAdmin,
       } = await init();
 
       // Receiver
@@ -780,6 +783,9 @@ module.exports = (init) => {
         tokenIds,
         batchIds,
         assetContractAsBouncerAdmin,
+        tokenIdsForCreatorEarning,
+        assetERC1155,
+        assetAdmin,
       });
     };
   }
@@ -1930,6 +1936,157 @@ module.exports = (init) => {
         [10, 3, 4, 5],
         [1, 2, 2, 2]
       );
+    });
+  });
+
+  describe('Creator Earnings', function (it) {
+    it('Can get royalty receivers of an Array of Asset ids', async function ({
+      assetERC1155,
+      tokenIdsForCreatorEarning,
+      minter,
+    }) {
+      const result = await assetERC1155.getRoyaltyReceivers(
+        tokenIdsForCreatorEarning
+      );
+      for (let i = 0; i < result.length; i++) {
+        assert.equal(result[i], minter);
+      }
+    });
+
+    it('Can get royalty receiver of an single Asset id', async ({
+      assetERC1155,
+      minter,
+      tokenIdsForCreatorEarning,
+    }) => {
+      const result = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result[0], minter);
+    });
+
+    it('Only creator can set the royalty receiver', async ({
+      assetERC1155,
+      user0,
+      tokenIdsForCreatorEarning,
+    }) => {
+      await expect(
+        assetERC1155
+          .connect(ethers.provider.getSigner(user0))
+          .setTokenRoyaltyReceiver(tokenIdsForCreatorEarning[0], user0)
+      ).to.be.revertedWith('AssetERC1155: Sender is not creator');
+    });
+
+    it('Creator can change royalty receiver', async ({
+      assetERC1155,
+      user0,
+      minter,
+      tokenIdsForCreatorEarning,
+    }) => {
+      await assetERC1155
+        .connect(ethers.provider.getSigner(minter))
+        .setTokenRoyaltyReceiver(tokenIdsForCreatorEarning[0], user0);
+      const result = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result[0], user0);
+    });
+
+    it('Creator can delete royalty information', async ({
+      assetERC1155,
+      minter,
+      tokenIdsForCreatorEarning,
+    }) => {
+      await assetERC1155
+        .connect(ethers.provider.getSigner(minter))
+        .resetTokenRoyalty(tokenIdsForCreatorEarning[0]);
+      const result = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result[0], zeroAddress);
+    });
+
+    it('Admin can set default royalty information', async ({
+      assetERC1155,
+      assetAdmin,
+      minter,
+      tokenIdsForCreatorEarning,
+      user0,
+    }) => {
+      await assetERC1155
+        .connect(ethers.provider.getSigner(assetAdmin))
+        .setDefaultRoyalty(user0, 500);
+      const result = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result[0], minter);
+      await assetERC1155
+        .connect(ethers.provider.getSigner(minter))
+        .resetTokenRoyalty(tokenIdsForCreatorEarning[0]);
+      const result1 = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result1[0], user0);
+    });
+
+    it('should revert if sender is not creator', async ({
+      assetERC1155,
+      minter,
+      user0,
+    }) => {
+      await expect(
+        assetERC1155
+          .connect(ethers.provider.getSigner(minter))
+          .setDefaultRoyalty(user0, 500)
+      ).to.revertedWith('!ADMIN');
+    });
+
+    it('Admin can delete default royalty information', async ({
+      assetERC1155,
+      assetAdmin,
+      minter,
+      tokenIdsForCreatorEarning,
+      user0,
+    }) => {
+      await assetERC1155
+        .connect(ethers.provider.getSigner(assetAdmin))
+        .setDefaultRoyalty(user0, 500);
+      const result = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result[0], minter);
+      await assetERC1155
+        .connect(ethers.provider.getSigner(minter))
+        .resetTokenRoyalty(tokenIdsForCreatorEarning[0]);
+      const result1 = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result1[0], user0);
+      await assetERC1155
+        .connect(ethers.provider.getSigner(assetAdmin))
+        .deleteDefaultRoyalty();
+      const result2 = await assetERC1155.royaltyInfo(
+        tokenIdsForCreatorEarning[0],
+        0
+      );
+      assert.equal(result2[0], zeroAddress);
+    });
+
+    it('Only admin can delete default royalty information', async ({
+      assetERC1155,
+      minter,
+    }) => {
+      await expect(
+        assetERC1155
+          .connect(ethers.provider.getSigner(minter))
+          .deleteDefaultRoyalty()
+      ).to.revertedWith('!ADMIN');
     });
   });
 

@@ -14,7 +14,11 @@ const generateERC1155Tests = require('../erc1155');
 function testAsset() {
   const erc1155Tests = generateERC1155Tests(
     withSnapshot(['Asset'], async () => {
-      const {deployer, assetBouncerAdmin} = await getNamedAccounts();
+      const {
+        deployer,
+        assetBouncerAdmin,
+        assetAdmin,
+      } = await getNamedAccounts();
       const otherAccounts = await getUnnamedAccounts();
       const minter = otherAccounts[0];
       const users = otherAccounts.slice(1);
@@ -57,6 +61,23 @@ function testAsset() {
           tokenId: receipt.events.find((v) => v.event === 'TransferSingle')
             .args[3],
         };
+      }
+
+      async function _mint(packId, supply, to) {
+        const receipt = await waitFor(
+          assetERC1155
+            .connect(ethers.provider.getSigner(minter))
+            ['mint(address,uint40,bytes32,uint256,address,bytes)'](
+              minter,
+              packId,
+              MOCK_DATA,
+              supply,
+              to,
+              '0x'
+            )
+        );
+        return receipt.events.find((v) => v.event == 'TransferSingle').args[3]
+          ._hex;
       }
 
       // Set up batch minting for test purposes
@@ -145,11 +166,16 @@ function testAsset() {
           1,
         ])
       ).tokenIds;
+      const tokenIdsForCreatorEarning = [];
+      for (let i = 0; i < 7; ++i) {
+        const id = await _mint(i, 1, users[0]);
+        tokenIdsForCreatorEarning.push(id);
+      }
 
       return {
         ethersProvider: ethers.provider,
         contractAddress: assetERC1155.address,
-        contract: assetERC1155,
+        assetERC1155,
         users,
         mint,
         mintMultiple,
@@ -160,6 +186,8 @@ function testAsset() {
         deployments,
         receiverAddress: assetERC1155.address,
         assetContractAsBouncerAdmin,
+        tokenIdsForCreatorEarning,
+        assetAdmin,
       };
     }),
     {}
