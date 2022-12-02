@@ -2,9 +2,10 @@
 pragma solidity 0.8.2;
 
 import "./AssetBaseERC1155.sol";
+import "../common/BaseWithStorage/ERC2981.sol";
 
 // solhint-disable-next-line no-empty-blocks
-contract AssetERC1155 is AssetBaseERC1155 {
+contract AssetERC1155 is AssetBaseERC1155, ERC2981 {
     event PredicateSet(address predicate);
 
     function initialize(
@@ -42,6 +43,7 @@ contract AssetERC1155 is AssetBaseERC1155 {
         uint256 uriId = id & ERC1155ERC721Helper.URI_ID;
         require(uint256(_metadataHash[uriId]) == 0, "ID_TAKEN");
         _metadataHash[uriId] = hash;
+        _setTokenRoyalty(id, creator, 0);
         _mint(_msgSender(), owner, id, supply, data);
     }
 
@@ -160,5 +162,41 @@ contract AssetERC1155 is AssetBaseERC1155 {
             numFTs *
             ERC1155ERC721Helper.PACK_NUM_FT_TYPES_OFFSET_MULTIPLIER + // number of fungible token in the pack, 12 bits
             packIndex; // packIndex (position in the pack), 11 bits
+    }
+
+    function getRoyaltyReceivers(uint256[] memory ids) external view returns (address[] memory) {
+        address[] memory royaltyReceivers = new address[](ids.length);
+        for (uint256 i; i < ids.length; i++) {
+            (address receiver, ) = royaltyInfo(ids[i], 0);
+            royaltyReceivers[i] = receiver;
+        }
+        return royaltyReceivers;
+    }
+
+    function supportsInterface(bytes4 id) public view override(AssetBaseERC1155, ERC2981) returns (bool) {
+        return AssetBaseERC1155.supportsInterface(id) || ERC2981.supportsInterface(id);
+    }
+
+    function setTokenRoyaltyReceiver(uint256 tokenId, address receiver) external {
+        address creator = address(uint160(tokenId >> 96));
+        require(creator == msg.sender, "AssetERC1155: Sender is not creator");
+        //    require(oldReceiver != receiver,"AssetERC1155: Old Reciver can't be new Reciver");
+        _setTokenRoyalty(tokenId, receiver, 0);
+    }
+
+    function resetTokenRoyalty(uint256 tokenId) external {
+        address creator = address(uint160(tokenId >> 96));
+        require(creator == msg.sender, "AssetERC1155: Sender is not creator");
+        _resetTokenRoyalty(tokenId);
+    }
+
+    function deleteDefaultRoyalty() external {
+        require(_msgSender() == _admin, "!ADMIN");
+        _deleteDefaultRoyalty();
+    }
+
+    function setDefaultRoyalty(address receiver, uint96 feeNumerator) external {
+        require(_msgSender() == _admin, "!ADMIN");
+        _setDefaultRoyalty(receiver, feeNumerator);
     }
 }

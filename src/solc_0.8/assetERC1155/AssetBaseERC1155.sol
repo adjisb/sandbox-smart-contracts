@@ -206,7 +206,7 @@ abstract contract AssetBaseERC1155 is WithSuperOperators, IERC1155 {
     /// @notice Query if a contract implements interface `id`.
     /// @param id the interface identifier, as specified in ERC-165.
     /// @return `true` if the contract implements `id`.
-    function supportsInterface(bytes4 id) external pure override returns (bool) {
+    function supportsInterface(bytes4 id) public view virtual override returns (bool) {
         return
             id == 0x01ffc9a7 || //ERC165
             id == 0xd9b67a26 || // ERC1155
