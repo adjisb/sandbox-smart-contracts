@@ -110,7 +110,10 @@
     "landsale:send": "yarn execute mainnet ./setup/landsales/send_assets_to_sales.ts",
     "landsale:withdraw": "yarn execute mainnet ./setup/landsales/withdraw_from_sales.ts",
     "hardhat": "hardhat",
-    "staking:compile": "yarn workspace staking compile"
+    "staking:compile": "yarn workspace staking compile",
+    "staking:test": "yarn workspace staking test",
+    "sandbox-core:compile": "yarn workspace sandbox-core compile",
+    "sandbox-core:test": "yarn workspace sandbox-core test"
   },
   "main": ".eslintrc.js",
   "directories": {
