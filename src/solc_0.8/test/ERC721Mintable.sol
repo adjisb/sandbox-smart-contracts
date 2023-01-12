@@ -1,11 +1,11 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.2;
 
-import {ERC721} from "@openzeppelin/contracts-0.8/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts-0.8/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /// @dev This is NOT a secure ERC721
 /// DO NOT USE in production.
-contract ERC721Mintable is ERC721 {
+contract ERC721Mintable is ERC721Enumerable {
     mapping(address => uint256) public fakeBalance;
 
     // solhint-disable-next-line no-empty-blocks
