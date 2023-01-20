@@ -24,6 +24,15 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
+        version: '0.8.13',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 2000,
+          },
+        },
+      },
+      {
         version: '0.8.2',
         settings: {
           optimizer: {
@@ -113,7 +122,7 @@ const config: HardhatUserConfig = {
     sandAdmin: {
       default: 2,
       mainnet: '0xeaa0993e1d21c2103e4f172a20d29371fbaf6d06',
-      polygon: '0x7A9fe22691c811ea339D9B73150e6911a5343DcA', // TODO: get sand admin multi sig contract
+      polygon: '0xfD30a48Bc6c56E24B0ebF1B0117d750e2CFf7531',
       goerli: '0x39D01ecc951C2c1f20ba0549e62212659c4d1e06',
       goerli_test: '0x39D01ecc951C2c1f20ba0549e62212659c4d1e06',
       mumbai: '0x49c4D4C94829B9c44052C5f5Cb164Fc612181165',
@@ -270,6 +279,10 @@ const config: HardhatUserConfig = {
       goerli: '0x5BC3D5A39a50BE2348b9C529f81aE79f00945897', // Leon account on demo.sandbox
       goerli_test: '0x5BC3D5A39a50BE2348b9C529f81aE79f00945897', // Leon account on demo.sandbox
     },
+    defaultOperatorFiltererRegistry:
+      '0x000000000000AAeB6D7670E522A718067333cd4E',
+    defaultOperatorFiltererSubscription:
+      '0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6',
     collectionCatalystMigrationsAdmin: 'sandAdmin', // TODO use special account or deployer ?
     catalystMinter: 'sandAdmin', // account that can mint catalysts
     catalystAdmin: 'sandAdmin', // can set minter and admin for catatalyt, as well as super operators
@@ -284,15 +297,12 @@ const config: HardhatUserConfig = {
     gemsCatalystsRegistryAdmin: 'sandAdmin',
     ozdRelayer: {
       default: 1,
+      mainnet: '0x0073e6eb087019bdb7bede02d23aeb068b74af99',
       polygon: '0x7051cb544c4a8d5aad1be46cc9524e48108e60b4',
+      goerli: '0x4751d4dc3d8cff421598592b51bb1d9a0fb116e9',
       mumbai: '0x3c17c97f29182aec3d16a080cda94d6f773bbd91',
     },
-    // OZ Defender relay
-    landMigrationBatchExecutor: {
-      default: 1,
-      mainnet: '0x0073e6eb087019bdb7bede02d23aeb068b74af99',
-      goerli: '0x4751d4dc3d8cff421598592b51bb1d9a0fb116e9',
-    },
+    landMigrationBatchExecutor: 'ozdRelayer',
   },
   networks: {
     /**

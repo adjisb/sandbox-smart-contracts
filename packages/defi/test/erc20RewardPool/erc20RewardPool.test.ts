@@ -34,9 +34,9 @@ describe('ERC20RewardPool main contract tests', function () {
         );
         await expect(
           method(poolAsOther, rewardToken.address)
-        ).to.be.revertedWith('not admin');
+        ).to.be.revertedWith('Ownable: caller is not the owner');
         await expect(method(poolAsOther, AddressZero)).to.be.revertedWith(
-          'ERC20RewardPool: is not a contract'
+          'RequirementsRules: is not a contract'
         );
       });
     }
@@ -848,7 +848,7 @@ describe('ERC20RewardPool main contract tests', function () {
 
       expect(
         contractAsOther.setTrustedForwarder(rewardToken.address)
-      ).to.be.revertedWith('ERC20RewardPool: not admin');
+      ).to.be.revertedWith('Ownable: caller is not the owner');
     });
     it('should success to set the trusted forwarder if a valid contract and admin', async function () {
       const {getUser, contract, rewardToken} = await setupERC20RewardPoolTest();
@@ -856,7 +856,7 @@ describe('ERC20RewardPool main contract tests', function () {
       const user = await getUser();
 
       expect(contract.setTrustedForwarder(user.address)).to.be.revertedWith(
-        'ERC20RewardPool: is not a contract'
+        'RequirementsRules: is not a contract'
       );
 
       expect(contract.setTrustedForwarder(rewardToken.address)).not.to.be
