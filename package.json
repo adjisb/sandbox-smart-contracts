@@ -120,7 +120,13 @@
     "starterpack:compile": "yarn workspace starterpack compile",
     "starterpack:test": "yarn workspace starterpack test",
     "catalyst:compile": "yarn workspace catalyst compile",
-    "catalyst:test": "yarn workspace catalyst test"
+    "catalyst:test": "yarn workspace catalyst test",
+    "raffle:compile": "yarn workspace raffle compile",
+    "raffle:test": "yarn workspace raffle test",
+    "claims:compile": "yarn workspace claims compile",
+    "claims:test": "yarn workspace claims test",
+    "asset:compile": "yarn workspace asset compile",
+    "asset:test": "yarn workspace asset test"
   },
   "main": ".eslintrc.js",
   "directories": {
