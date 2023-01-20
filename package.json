@@ -126,7 +126,13 @@
     "claims:compile": "yarn workspace claims compile",
     "claims:test": "yarn workspace claims test",
     "asset:compile": "yarn workspace asset compile",
-    "asset:test": "yarn workspace asset test"
+    "asset:test": "yarn workspace asset test",
+    "asset-erc721:compile": "yarn workspace asset-erc721 compile",
+    "asset-erc721:test": "yarn workspace asset-erc721 test",
+    "asset-erc1155:compile": "yarn workspace asset-erc1155 compile",
+    "asset-erc1155:test": "yarn workspace asset-erc1155 test",
+    "bundle-sand:compile": "yarn workspace bundle-sand compile",
+    "bundle-sand:test": "yarn workspace bundle-sand test"
   },
   "main": ".eslintrc.js",
   "directories": {
