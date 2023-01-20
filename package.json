@@ -116,7 +116,11 @@
     "defi:compile": "yarn workspace defi compile",
     "defi:test": "yarn workspace defi test",
     "sandbox-core:compile": "yarn workspace sandbox-core compile",
-    "sandbox-core:test": "yarn workspace sandbox-core test"
+    "sandbox-core:test": "yarn workspace sandbox-core test",
+    "starterpack:compile": "yarn workspace starterpack compile",
+    "starterpack:test": "yarn workspace starterpack test",
+    "catalyst:compile": "yarn workspace catalyst compile",
+    "catalyst:test": "yarn workspace catalyst test"
   },
   "main": ".eslintrc.js",
   "directories": {
