@@ -1,9 +1,15 @@
 import {expect} from 'chai';
 import {setupEscrow} from './fixtures';
-import {escrow712Signature, escrow712Signature2} from './signature';
+import {
+  escrow712Signature,
+  escrow712Signature2,
+  escrow712Signature3,
+} from './signature';
 import {ethers} from 'hardhat';
 import {waitFor} from '../utils';
 import {BigNumber} from 'ethers';
+import {signTypedData} from '@metamask/eth-sig-util';
+import {splitSignature} from 'ethers/lib/utils';
 
 describe('Escrow.sol XXXXXX VVVVVV ', function () {
   it('register a new token', async function () {
@@ -124,35 +130,6 @@ describe('Escrow.sol XXXXXX VVVVVV ', function () {
     await mintableERC721.mint(owner, tokenId);
     await mintableERC721AsOwner.approve(escrowContractAsOwner.address, tokenId);
 
-    console.log('sig recovery');
-    let recAdds = await escrowContractAsOwner.Pverify(
-      27,
-      '0x47b448b0a30798c51274d8f7fd3fb0c9eb75e89aec2f9fbe3d604cf4f26d2a30',
-      '0x165585cb4a821ef23ff259be2dbf0624e339e7cbca0c43a836d9f1a753c9837f',
-      '0x1b2b37315783790f31a72d073632333423ba506315ad4c61c60524544e941575',
-      [1]
-    );
-    console.log('recovered sig');
-    console.log(recAdds);
-
-    /* function Pverify(
-      uint8 v,
-      bytes32 r,
-      bytes32 s,
-      bytes32 tokenID,
-      address originalOwner,
-      uint256[] calldata timesAvaliable
- */
-    /* v
-      EscrowView.jsx:296 27
-      EscrowView.jsx:297 r
-      EscrowView.jsx:298 0x47b448b0a30798c51274d8f7fd3fb0c9eb75e89aec2f9fbe3d604cf4f26d2a30
-      EscrowView.jsx:299 s
-      EscrowView.jsx:300 0x165585cb4a821ef23ff259be2dbf0624e339e7cbca0c43a836d9f1a753c9837f
-      EscrowView.jsx:301 0x3d68af2C576A1B4072174EaF5bD981A02751Ec31
-      EscrowView.jsx:302 123
-      EscrowView.jsx:303 ['1'] */
-
     //owner token times
     //console.log(signature);
     const hashedTokenId = ethers.utils.solidityKeccak256(
@@ -170,8 +147,6 @@ describe('Escrow.sol XXXXXX VVVVVV ', function () {
       [ethers.utils.solidityPack(['uint[]'], [[1, 7, 30]])]
     );
 
-    //const possibleTimes = ethers.utils.solidityPack(['uint[]'], [[1, 7, 30]]);
-
     const {v, r, s} = await escrow712Signature2(
       escrowContract,
       owner,
@@ -183,16 +158,6 @@ describe('Escrow.sol XXXXXX VVVVVV ', function () {
     console.log(v);
     console.log(r);
     console.log(s);
-
-    recAdds = await escrowContractAsOwner.Pverify(v, r, s, hashedTokenId, [
-      1,
-      7,
-      30,
-    ]);
-    console.log('recovered sig');
-    console.log(recAdds);
-    console.log('owner');
-    console.log(owner);
 
     //const receipt = await rentingContract.rent(owner, tokenId, v, r, s);
     const receipt = await waitFor(

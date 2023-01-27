@@ -15,6 +15,8 @@ interface IEscrow {
 
     function balances(bytes32) external returns (uint256);
 
+    function features(bytes32) external returns (address);
+
     //function tokens(address) external returns (uint256);
 
     function deposit(

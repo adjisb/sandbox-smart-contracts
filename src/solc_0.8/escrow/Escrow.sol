@@ -31,6 +31,7 @@ contract Escrow is ERC165, IERC721Holder, IEscrow, EIP712Upgradeable {
     mapping(bytes32 => address) public override owners;
     mapping(bytes32 => uint256) public override locks;
     mapping(bytes32 => uint256) public override balances;
+    mapping(bytes32 => address) public override features;
     mapping(bytes32 => bytes) public timeLockSignature;
     uint256[] public times;
 
