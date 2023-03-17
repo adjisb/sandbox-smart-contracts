@@ -163,8 +163,5 @@ jobs:
 
       - name: Deploy contracts
         run: yarn deploy:ci
-
-      - name: Fork Deploy contracts from goerli
-        run: yarn fork:deploy goerli
         env:
           ETH_NODE_URI_GOERLI: ${{ secrets.ETH_NODE_URI_GOERLI }}
