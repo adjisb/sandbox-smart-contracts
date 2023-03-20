@@ -7,12 +7,20 @@
                     "test",
                     "coverage",
                     "lint",
-                    "deploy"
+                    "deploy",
+                    "format"
                 ]
             }
         }
     },
-    "defaultBase": "master",
+    "targetDefaults": {
+        "coverage": {
+            "dependsOn": [
+                "test"
+            ]
+        }
+    },
+    "defaultBase": "origin/master",
     "affected": {
         "defaultBase": "origin/master"
     }

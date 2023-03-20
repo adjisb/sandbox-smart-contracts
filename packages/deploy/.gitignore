@@ -1,0 +1,15 @@
+cache/
+artifacts/
+node_modules/
+.env
+contractsInfo.json
+deployments/hardhat
+deployments/localhost
+
+.idea/
+.DS_Store
+
+# TODO: Remove after fixing the deploy scripts
+secret/
+.proofs*
+###
