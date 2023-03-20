@@ -4,8 +4,8 @@
   "description": "smart contracts for the sandbox",
   "license": "MIT",
   "files": [
-    "deployments/mainnet",
-    "deployments/rinkeby"
+    "src",
+    ".setup.js"
   ],
   "keywords": [
     "ethereum",
