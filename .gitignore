@@ -33,6 +33,7 @@ scripts/giveaway/proofs/**/
 token.json
 .bitski*
 .mythx_credentials*
+.fuzz.yml
 .mnemonic*
 .temporal*
 .sandbox_credentials
@@ -52,3 +53,7 @@ giveaway.json
 .idea/
 
 .DS_Store
+
+.yarnrc
+.yarnrc.yml
+.yarn/
