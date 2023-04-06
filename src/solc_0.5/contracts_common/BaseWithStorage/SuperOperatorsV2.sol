@@ -1,6 +1,6 @@
 pragma solidity 0.5.9;
 
-import "./AdminV2.sol";
+import {AdminV2} from "./AdminV2.sol";
 
 contract SuperOperatorsV2 is AdminV2 {
 

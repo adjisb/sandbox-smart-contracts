@@ -2,9 +2,9 @@
 
 pragma solidity 0.5.9;
 
-import "./Land/erc721/LandBaseTokenV3.sol";
-import "./Land/erc721/ERC721BaseTokenV2.sol";
-import "./OperatorFilterer/contracts/upgradeable/OperatorFiltererUpgradeable.sol";
+import {LandBaseTokenV3} from "./Land/erc721/LandBaseTokenV3.sol";
+import {ERC721BaseTokenV2} from "./Land/erc721/ERC721BaseTokenV2.sol";
+import {OperatorFiltererUpgradeable} from "./OperatorFilterer/contracts/upgradeable/OperatorFiltererUpgradeable.sol";
 
 contract LandV3 is LandBaseTokenV3, OperatorFiltererUpgradeable {
     /**

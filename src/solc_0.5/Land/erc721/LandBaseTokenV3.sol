@@ -1,7 +1,7 @@
 /* solhint-disable func-order, code-complexity */
 pragma solidity 0.5.9;
 
-import "./ERC721BaseTokenV2.sol";
+import {ERC721BaseTokenV2} from "./ERC721BaseTokenV2.sol";
 
 contract LandBaseTokenV3 is ERC721BaseTokenV2 {
     // Our grid is 408 x 408 lands
@@ -78,7 +78,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
     ) external {
         require(to != address(0), "to is zero address");
         require(isMinter(msg.sender), "Only a minter can mint");
-        
+
         if (exists(size, x, y) == true) {
             _transferQuad(msg.sender, to, size, x, y);
             _numNFTPerAddress[msg.sender] -= size * size;
