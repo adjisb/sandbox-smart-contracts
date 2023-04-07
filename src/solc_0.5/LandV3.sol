@@ -6,6 +6,12 @@ import "./Land/erc721/LandBaseTokenV3.sol";
 import "./Land/erc721/ERC721BaseTokenV2.sol";
 import "./OperatorFilterer/contracts/upgradeable/OperatorFiltererUpgradeable.sol";
 
+/**
+ * @title LandV3
+ * @author The Sandbox
+ * @notice LAND contract
+ * @dev LAND contract implements ERC721, quad and marketplace filtering functionalities
+ */
 contract LandV3 is LandBaseTokenV3, OperatorFiltererUpgradeable {
     /**
      * @notice Return the name of the token contract
