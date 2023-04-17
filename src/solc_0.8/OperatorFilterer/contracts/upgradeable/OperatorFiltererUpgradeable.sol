@@ -5,7 +5,7 @@ import {IOperatorFilterRegistry} from "../../interfaces/IOperatorFilterRegistry.
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 ///@title OperatorFiltererUpgradeable
-///@notice This contract would subscibe or copy or just to the subscription provided or just register to default subscription list
+///@notice This contract would subscribe or copy the subscription provided or just register to default subscription list
 abstract contract OperatorFiltererUpgradeable is Initializable {
     IOperatorFilterRegistry public operatorFilterRegistry;
 

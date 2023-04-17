@@ -78,7 +78,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
     ) external {
         require(to != address(0), "to is zero address");
         require(isMinter(msg.sender), "Only a minter can mint");
-        
+
         if (exists(size, x, y) == true) {
             _transferQuad(msg.sender, to, size, x, y);
             _numNFTPerAddress[msg.sender] -= size * size;
@@ -385,7 +385,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
                 "Already minted"
             );
         } else {
-            // when the size is smaller than the quadCompare size the owner of all the smaller quads with size
+            // when the size is bigger than the quadCompare size the owner of all the smaller quads with size
             // quadCompare size in the quad to be minted are checked if they are minted or not
             uint256 toX = x + size;
             uint256 toY = y + size;
@@ -467,7 +467,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
     /// is checked if owned by the "from" address. If from is the owner then land owner is set to "to" address
     /// @param from address of the previous owner
     /// @param to address of the new owner
-    /// @param land the quad to be regrouped and transfered
+    /// @param land the quad to be regrouped and transferred
     /// @param set for setting the new owner
     /// @param childQuadSize  size of the child quad to be checked for owner in the regrouping
     function _regroupQuad(
@@ -482,7 +482,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         bool ownerOfAll = true;
 
         {
-            // double for loop itereates and checks owner of all the smaller quads in land
+            // double for loop iterates and checks owner of all the smaller quads in land
             for (uint256 xi = land.x; xi < land.x + land.size; xi += childQuadSize) {
                 for (uint256 yi = land.y; yi < land.y + land.size; yi += childQuadSize) {
                     uint256 ownerChild;
@@ -510,7 +510,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
                             _owners[idChild] = 0;
                         }
                     }
-                    // ownerOfAll should be true if "from" is owner of all the child quads ittereated over
+                    // ownerOfAll should be true if "from" is owner of all the child quads itereated over
                     ownerOfAll = (ownAllIndividual || ownerChild != 0) && ownerOfAll;
                 }
             }
