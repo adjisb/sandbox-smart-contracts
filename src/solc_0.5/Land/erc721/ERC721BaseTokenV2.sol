@@ -36,6 +36,7 @@ contract ERC721BaseTokenV2 is ERC721Events, SuperOperatorsV2, MetaTransactionRec
         _admin = admin;
         _setMetaTransactionProcessor(metaTransactionContract, true);
         _initialized = true;
+        emit AdminChanged(address(0), _admin);
     }
 
     function _transferFrom(address from, address to, uint256 id) internal {
