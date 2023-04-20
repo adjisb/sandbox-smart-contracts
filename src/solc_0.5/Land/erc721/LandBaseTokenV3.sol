@@ -581,7 +581,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         return ownerOfAll;
     }
 
-    ///
+    /// @notice Goes through every token id of a quad id
     /// @param i ith token of the quad
     /// @param size size of the quad
     /// @param x The top left x coordinate of the quad
@@ -639,7 +639,7 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         return ((id << 8) >> 8) / GRID_SIZE;
     }
 
-    /// @param size size of the quad
+    /// @param size of the quad
     /// @return layer the layer associated to that quad size
     /// @return parentSize size of the parent quad
     /// @return childLayer layer of the child quad size
@@ -674,9 +674,9 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         }
     }
 
-    /// @param layer layer of the quad size
-    /// @param x x coordinate of the quad
-    /// @param y y coordinate of the quad
+    /// @param layer of the quad size
+    /// @param x coordinate of the quad
+    /// @param y coordinate of the quad
     /// @return the quad id
     function _getQuadId(
         uint256 layer,
@@ -686,9 +686,9 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         quadId = layer + x + y * GRID_SIZE;
     }
 
-    /// @param size size of the quad
-    /// @param x x coordinate of the quad
-    /// @param y y coordinate of the quad
+    /// @param size of the quad
+    /// @param x coordinate of the quad
+    /// @param y coordinate of the quad
     /// @return address of the owner of the quad
     function _ownerOfQuad(
         uint256 size,
@@ -706,9 +706,9 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
     }
 
     /// @param id quad id
-    /// @return size size of the quad
-    /// @return x x coordinate
-    /// @return y y coordinate
+    /// @return size of the quad
+    /// @return x coordinate
+    /// @return y coordinate
     function _getQuadById(uint256 id)
         internal
         pure
