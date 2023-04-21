@@ -602,7 +602,6 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         }
     }
 
-    ///
     /// @param mintedLand array of lands
     /// @param quad quad to check
     /// @param index size of the array
