@@ -18,7 +18,9 @@ contract ERC721BaseTokenV2 is ERC721Events, SuperOperatorsV2, MetaTransactionRec
     bytes4 internal constant ERC721_MANDATORY_RECEIVER = 0x5e8bf644;
 
     mapping(address => uint256) public _numNFTPerAddress;
-    // mapping to store owner of lands and quads. For 1x1 lands it also the 255 bit is 1 if that land has operator approved and is 0 if no operator is approved. For burned 1x1 Land 160 bit is set to 1.
+    /**
+    @notice mapping to store owner of lands and quads. For 1x1 lands it also the 255 bit is 1 if that land has operator approved and is 0 if no operator is approved. For burned 1x1 Land 160 bit is set to 1.
+     */
     mapping(uint256 => uint256) public _owners;
     mapping(address => mapping(address => bool)) public _operatorsForAll;
     mapping(uint256 => address) public _operators;
