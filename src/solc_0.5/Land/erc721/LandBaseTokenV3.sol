@@ -229,7 +229,12 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         return _ownerOfQuad(size, x, y) != address(0);
     }
 
-    /// @dev checks if the child quads in the parent quad (size, x, y) are owned by msg.sender. It recursively checks child quad of every size(exculding Lands of 1x1 size) are minted or not. Quad which are minted are pushed into quadMinted to also check if every Land of size 1x1 in the parent quad is minted or not. While checking if the every child Quad and Land is minted it also checks and clear the owner for quads which are minted. Finally it checks if the new owner if is a contract can handle ERC721 tokens or not and transfers the parent quad to new owner.
+    /** @dev checks if the child quads in the parent quad (size, x, y) are owned by msg.sender.
+    * It recursively checks child quad of every size(exculding Lands of 1x1 size) are minted or not.
+    * Quad which are minted are pushed into quadMinted to also check if every Land of size 1x1 in the parent quad is minted or not.
+    * While checking if the every child Quad and Land is minted it also checks and clear the owner for quads which are minted.
+    * Finally it checks if the new owner if is a contract can handle ERC721 tokens or not and transfers the parent quad to new owner.
+    */
     /// @param to The address to which the ownership of the quad will be transferred
     /// @param size The size of the quad being minted and transfered
     /// @param x The x-coordinate of the top-left corner of the quad being minted.
@@ -311,14 +316,14 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         }
     }
 
-    /// @dev checks if the receiver of the quad(size, x, y) is a contact. If yes can it handle ERC721 tokens. It also clears owner of 1x1 land's owned by msg.sender.
+    /// @dev checks if the receiver of the quad(size, x, y) is a contact. If yes can it handle ERC721 tokens.
+    ///      It also clears owner of 1x1 land's owned by msg.sender.
     /// @param quadMinted - an array of Land structs in which the minted child quad or Quad to be transfered are.
-    /// @param landMinted - the total amount of land that has been minted
     /// @param index - the index of the last element in the quadMinted array
+    /// @param landMinted - the total amount of land that has been minted
     /// @param to the address of the new owner of Quad to be transfered
     /// @param size The size of the quad being minted and transfered
     /// @param x The x-coordinate of the top-left corner of the quad being minted.
-    /// @param y The y-coordinate of the top-left corner of the quad being minted.
     /// @param y The y-coordinate of the top-left corner of the quad being minted.
     function _checkBatchReceiverAcceptQuadAndClearOwner(
         Land[] memory quadMinted,
@@ -330,7 +335,8 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         uint256 y,
         bytes memory data
     ) internal {
-        // checks if to is a contract and supports ERC721_MANDATORY_RECEIVER interfaces. if it doesn't it just clears the owner of 1x1 lands in quad(size, x, y)
+        // checks if to is a contract and supports ERC721_MANDATORY_RECEIVER interfaces.
+        // if it doesn't it just clears the owner of 1x1 lands in quad(size, x, y)
         if (to.isContract() && _checkInterfaceWith10000Gas(to, ERC721_MANDATORY_RECEIVER)) {
             // array to push minted 1x1 land
             uint256[] memory idsToTransfer = new uint256[](landMinted);
@@ -462,13 +468,17 @@ contract LandBaseTokenV3 is ERC721BaseTokenV2 {
         }
     }
 
-    /// @dev recursivly checks if the child quads are minted in land and push them to the quadMinted array. if a child quad is minted in land such quads child quads will be skipped such that there is no overlapping in quads which are minted. it clears the minted child quads owners.
+    /** @dev recursivly checks if the child quads are minted in land and push them to the quadMinted array.
+    * if a child quad is minted in land such quads child quads will be skipped such that there is no
+    * overlapping in quads which are minted. it clears the minted child quads owners.
+    */
     /// @param land the stuct which has the size x and y co-ordinate of Quad to be checked
     /// @param quadMinted array in which the minted child quad would be pushed
     /// @param landMinted total 1x1 land already minted
     /// @param index index of last element of quadMinted array
     /// @param quadCompareSize the size of the child quads to be checked.
     /// @return the index of last quad pushed in quadMinted array and the total land already minted
+    /// @return the number of lands minted
     function _checkAndClearOwner(
         Land memory land,
         Land[] memory quadMinted,
