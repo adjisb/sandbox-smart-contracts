@@ -4,10 +4,10 @@ pragma solidity 0.8.2;
 import {IOperatorFilterRegistry} from "../../interfaces/IOperatorFilterRegistry.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-///@title OperatorFiltererUpgradeable
-///@author The Sandbox
-///@notice This contract would subscibe or copy or just to the subscription provided or just register to default subscription list
-///@dev This contract is the upgradeable version of the OpenSea implementation https://github.com/ProjectOpenSea/operator-filter-registry/blob/main/src/OperatorFilterer.sol and adapted to the 0.5.9 solidity version
+/// @title OperatorFiltererUpgradeable
+/// @author The Sandbox
+/// @notice This contract would subscibe or copy or just to the subscription provided or just register to default subscription list
+/// @dev This contract is the upgradeable version of the OpenSea implementation https://github.com/ProjectOpenSea/operator-filter-registry/blob/main/src/OperatorFilterer.sol and adapted to the 0.5.9 solidity version
 abstract contract OperatorFiltererUpgradeable is Initializable {
     IOperatorFilterRegistry public operatorFilterRegistry;
 
