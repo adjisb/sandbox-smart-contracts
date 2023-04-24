@@ -7,7 +7,6 @@ import "./Land/erc721/ERC721BaseTokenV2.sol";
 import "./OperatorFilterer/contracts/upgradeable/OperatorFiltererUpgradeable.sol";
 
 contract LandV3 is LandBaseTokenV3, OperatorFiltererUpgradeable {
-
     event OperatorRegistrySet(address indexed registry);
 
     /**
@@ -73,7 +72,7 @@ contract LandV3 is LandBaseTokenV3, OperatorFiltererUpgradeable {
     /// @param subscriptionOrRegistrantToCopy registration address of the list to subscribe.
     /// @param subscribe bool to signify subscription "true"" or to copy the list "false".
     function register(address subscriptionOrRegistrantToCopy, bool subscribe) external onlyAdmin {
-        require(subscriptionOrRegistrantToCopy != address(0),"LandV3: subscription can't be zero address");
+        require(subscriptionOrRegistrantToCopy != address(0), "LandV3: subscription can't be zero address");
         _register(subscriptionOrRegistrantToCopy, subscribe);
     }
 
