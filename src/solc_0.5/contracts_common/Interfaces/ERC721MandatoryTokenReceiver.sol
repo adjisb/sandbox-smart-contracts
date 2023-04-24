@@ -15,6 +15,7 @@ interface ERC721MandatoryTokenReceiver {
      * @param from owner of the tokens
      * @param ids token ids
      * @param data extra data
+     * @return 0x4b808c46 if the transfer is a success
      */
     function onERC721BatchReceived(
         address operator,
@@ -30,6 +31,7 @@ interface ERC721MandatoryTokenReceiver {
      * @param from owner of the token
      * @param tokenId token id
      * @param data extra data
+     * @return 0x150b7a02 if the transfer is a success
      */
     function onERC721Received(
         address operator,
