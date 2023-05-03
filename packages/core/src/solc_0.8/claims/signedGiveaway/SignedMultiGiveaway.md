@@ -15,14 +15,14 @@ message is composed of:
 - From: usually the rewards must be transferred to the contract and this value is address(this), if a strategy with
   approve and transfer is used this is the address of the source.
 - To: the destination address that will get the rewards.
-- Claims: A list of union structs that include: token type (ERC20, ERC721, ERC1155), token address and a data field that
-  depending on the token type may have: amount, tokenId, etc.
+- Claims: A list of union structs (ClaimEntry) that include: token type (ERC20, ERC721, ERC1155, etc), token address and
+  a data field that depending on the token type may have: amount, tokenId, etc.
 
 ```solidity
 Signature[] calldata sigs,
 uint256[] calldata claimIds,
 uint256 expiration,
-address from, // address(this)
+address from, // if different from address(this) then must be used with approve
 address to,
 ClaimEntry[] calldata claims
 ```
@@ -58,6 +58,106 @@ We have the following limits:
 - max wei per token: total amount of tokens per sec transferred. This is a rate limit that applies to the total amount
   transferred for each token/tokenId.
 
+## Events info
+
+### AssetsRecovered event
+
+```solidity
+event AssetsRecovered(address to, tuple[] claims, address operator);
+```
+
+### Claimed event
+
+```solidity
+event Claimed(
+uint256[] claimIds,
+address indexed from,
+address indexed to,
+tuple[] claims,
+address operator
+);
+```
+
+### MaxClaimEntriesSet event
+
+```solidity
+event MaxClaimEntriesSet(uint256 maxClaimEntries, address operator);
+```
+
+### MaxWeiPerClaimSet event
+
+```solidity
+event MaxWeiPerClaimSet(address token, uint256 tokenId, uint96 maxWeiPerClaim, address operator);
+```
+
+### NumberOfSignaturesNeededSet event
+
+```solidity
+event NumberOfSignaturesNeededSet(uint256 numberOfSignaturesNeeded, address operator);
+```
+
+### Paused event
+
+```solidity
+event Paused(address account);
+```
+
+### RateLimitSet event
+
+```solidity
+event RateLimitSet(
+address token,
+uint256 tokenId,
+uint32 timeBase,
+uint128 maxWeiPerTimeBase,
+address operator
+);
+```
+
+### RevokedClaims event
+
+```solidity
+event RevokedClaims(uint256[] claimIds, address operator);
+```
+
+### RoleAdminChanged event
+
+```solidity
+event RoleAdminChanged(
+bytes32 indexed role,
+bytes32 indexed previousAdminRole,
+bytes32 indexed newAdminRole
+);
+```
+
+### RoleGranted event
+
+```solidity
+event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);
+```
+
+### RoleRevoked event
+
+```solidity
+event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
+```
+
+### Unpaused event
+
+```solidity
+event Unpaused(address account);
+```
+
+## State variables info
+
+### BACKOFFICE_ROLE (0x6406156d)
+
+```solidity
+function BACKOFFICE_ROLE() external view returns (bytes32);
+```
+
+this role is for addresses that help the admin. Can pause the contract, butF, only the admin can unpause it.
+
 ## Functions info
 
 ### CLAIM_ENTRY_TYPEHASH (0xba94ec0d)
@@ -83,6 +183,20 @@ function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
 ```solidity
 function SIGNER_ROLE() external view returns (bytes32);
 ```
+
+### batchClaim (0x4ac48bc1)
+
+```solidity
+function batchClaim(tuple[] batch) external;
+```
+
+does a lot of claims in batch
+
+Parameters:
+
+| Name  | Type    | Description                          |
+| :---- | :------ | :----------------------------------- |
+| batch | tuple[] | an array of args to the claim method |
 
 ### claim (0xbec74704)
 
@@ -115,7 +229,13 @@ Parameters:
 function claimed(uint256 claimId) external view returns (bool);
 ```
 
-Return true if already claimed
+return true if already claimed
+
+Return values:
+
+| Name | Type | Description     |
+| :--- | :--- | :-------------- |
+| _0   | bool | true if claimed |
 
 ### domainSeparator (0xf698da25)
 
@@ -131,6 +251,56 @@ Return values:
 | :--- | :------ | :------------------------------- |
 | _0   | bytes32 | the hash of the domain separator |
 
+### getMaxClaimEntries (0x4423c4bc)
+
+```solidity
+function getMaxClaimEntries() external view returns (uint256);
+```
+
+get the maximum claim entries per claim
+
+### getMaxWeiPerClaim (0xaa5a047d)
+
+```solidity
+function getMaxWeiPerClaim(address token, uint256 tokenId) external view returns (uint256);
+```
+
+get maximum Weis that can be claimed at once
+
+even tokenId is kind of inconsistent for tokenType!=ERC1155 it doesn't harm
+
+Parameters:
+
+| Name    | Type    | Description                                |
+| :------ | :------ | :----------------------------------------- |
+| token   | address | the token contract address                 |
+| tokenId | uint256 | inf ERC1155 the token id else must be zero |
+
+### getNumberOfSignaturesNeeded (0xdbbac9cc)
+
+```solidity
+function getNumberOfSignaturesNeeded() external view returns (uint256);
+```
+
+get the needed number of signatures to approve a claim
+
+### getRateLimit (0x9f45e947)
+
+```solidity
+function getRateLimit(address token, uint256 tokenId) external view returns (tuple);
+```
+
+get the rate limit (rate = maxWeiPerTimeBase / timeBase) and last claim timestamp
+
+even tokenId is kind of inconsistent for tokenType!=ERC1155 it doesn't harm
+
+Parameters:
+
+| Name    | Type    | Description                                |
+| :------ | :------ | :----------------------------------------- |
+| token   | address | the token contract address                 |
+| tokenId | uint256 | inf ERC1155 the token id else must be zero |
+
 ### getRoleAdmin (0x248a9ca3)
 
 ```solidity
@@ -139,6 +309,27 @@ function getRoleAdmin(bytes32 role) external view returns (bytes32);
 
 Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_
 setRoleAdmin}.
+
+### getRoleMember (0x9010d07c)
+
+```solidity
+function getRoleMember(bytes32 role, uint256 index) external view returns (address);
+```
+
+Returns one of the accounts that have `role`. `index` must be a value between 0 and {getRoleMemberCount}, non-inclusive.
+Role bearers are not sorted in any particular way, and their ordering may change at any point. WARNING: When using
+{getRoleMember} and {getRoleMemberCount}, make sure you perform all queries on the same block. See the
+following https://forum.openzeppelin.com/t/iterating-over-elements-on-enumerableset-in-openzeppelin-contracts/2296[forum
+post] for more information.
+
+### getRoleMemberCount (0xca15c873)
+
+```solidity
+function getRoleMemberCount(bytes32 role) external view returns (uint256);
+```
+
+Returns the number of accounts that have `role`. Can be used together with {getRoleMember} to enumerate all bearers of a
+role.
 
 ### getTrustedForwarder (0xce1b815f)
 
@@ -153,6 +344,7 @@ function grantRole(bytes32 role, address account) external;
 ```
 
 Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements:
+
 - the caller must have ``role``'s admin role.
 
 ### hasRole (0x91d14854)
@@ -272,66 +464,75 @@ function revokeRole(bytes32 role, address account) external;
 Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the
 caller must have ``role``'s admin role.
 
-### setLimitPerId (0xb906966c)
+### setMaxClaimEntries (0x1208999f)
 
 ```solidity
-function setLimitPerId(
-  address token,
-  uint256 tokenId,
-  uint32 timeBase,
-  uint128 maxWeiPerTimeBase,
-  uint96 maxWeiPerClaim
-) external;
-```
-
-set the limits per token and tokenId
-
-Parameters:
-
-| Name              | Type    | Description                                                          |
-| :---------------- | :------ | :------------------------------------------------------------------- |
-| token             | address | the token to which will assign the limit                             |
-| tokenId           | uint256 | the id of the token                                                  |
-| timeBase          | uint32  | the base time of the rate limit in secs for 10eth/week => 60*60*24*7 |
-| maxWeiPerTimeBase | uint128 | the max amount of the rate limit for 10eth/week => 10eth             |
-| maxWeiPerClaim    | uint96  | the max amount per each claim, for example 0.01eth per claim         |
-
-### setLimitPerToken (0xa61ccb5d)
-
-```solidity
-function setLimitPerToken(
-  address token,
-  uint32 timeBase,
-  uint128 maxWeiPerTimeBase,
-  uint96 maxWeiPerClaim
-) external;
-```
-
-set the limits per token
-
-Parameters:
-
-| Name              | Type    | Description                                                          |
-| :---------------- | :------ | :------------------------------------------------------------------- |
-| token             | address | the token to which will assign the limit                             |
-| timeBase          | uint32  | the base time of the rate limit in secs for 10eth/week => 60*60*24*7 |
-| maxWeiPerTimeBase | uint128 | the max amount of the rate limit for 10eth/week => 10eth             |
-| maxWeiPerClaim    | uint96  | the max amount per each claim, for example 0.01eth per claim         |
-
-### setLimits (0x3f34c514)
-
-```solidity
-function setLimits(uint64 numberOfSignatures, uint64 maxClaimEntries) external;
+function setMaxClaimEntries(uint64 maxClaimEntries) external;
 ```
 
 set the global limits of the contract
 
 Parameters:
 
-| Name               | Type   | Description                                                                            |
-| :----------------- | :----- | :------------------------------------------------------------------------------------- |
-| numberOfSignatures | uint64 | number of signatures needed to approve a claim (default to 1)                          |
-| maxClaimEntries    | uint64 | maximum number of entries in a claim (amount of transfers) that can be claimed at once |
+| Name            | Type   | Description                                                                            |
+| :-------------- | :----- | :------------------------------------------------------------------------------------- |
+| maxClaimEntries | uint64 | maximum number of entries in a claim (amount of transfers) that can be claimed at once |
+
+### setMaxWeiPerClaim (0xa8e32557)
+
+```solidity
+function setMaxWeiPerClaim(address token, uint256 tokenId, uint96 maxWeiPerClaim) external;
+```
+
+set the limits per token and tokenId
+
+even tokenId is kind of inconsistent for tokenType!=ERC1155 it doesn't harm
+
+Parameters:
+
+| Name           | Type    | Description                                                  |
+| :------------- | :------ | :----------------------------------------------------------- |
+| token          | address | the token to which will assign the limit                     |
+| tokenId        | uint256 | for ERC1155 is the id of the token, else it must be zero     |
+| maxWeiPerClaim | uint96  | the max amount per each claim, for example 0.01eth per claim |
+
+### setNumberOfSignaturesNeeded (0x9d188955)
+
+```solidity
+function setNumberOfSignaturesNeeded(uint64 numberOfSignaturesNeeded) external;
+```
+
+set the global limits of the contract
+
+Parameters:
+
+| Name                     | Type   | Description                                                   |
+| :----------------------- | :----- | :------------------------------------------------------------ |
+| numberOfSignaturesNeeded | uint64 | number of signatures needed to approve a claim (default to 1) |
+
+### setRateLimit (0x3e0bf3aa)
+
+```solidity
+function setRateLimit(
+  address token,
+  uint256 tokenId,
+  uint32 timeBase,
+  uint128 maxWeiPerTimeBase
+) external;
+```
+
+set the limits per token and tokenId
+
+even tokenId is kind of inconsistent for tokenType!=ERC1155 it doesn't harm
+
+Parameters:
+
+| Name              | Type    | Description                                                          |
+| :---------------- | :------ | :------------------------------------------------------------------- |
+| token             | address | the token to which will assign the limit                             |
+| tokenId           | uint256 | for ERC1155 is the id of the token, else it must be zero             |
+| timeBase          | uint32  | the base time of the rate limit in secs for 10eth/week => 60*60*24*7 |
+| maxWeiPerTimeBase | uint128 | the max amount of the rate limit for 10eth/week => 10eth             |
 
 ### supportsInterface (0x01ffc9a7)
 

@@ -34,7 +34,7 @@ abstract contract SignedMultiGiveawayBase is
         bytes32 s;
     }
 
-    enum TokenType {INVALID, ERC20, ERC721, ERC721_SAFE, ERC1155, ERC1155_BATCH}
+    enum TokenType {INVALID, ERC20, ERC721, ERC721_BATCH, ERC721_SAFE, ERC721_SAFE_BATCH, ERC1155, ERC1155_BATCH}
     /// @dev this is a union type, data depends on the tokenType it can be amount, amount + tokenId, etc.
     struct ClaimEntry {
         TokenType tokenType;
@@ -135,7 +135,7 @@ abstract contract SignedMultiGiveawayBase is
     ) internal virtual {
         require(expiration == 0 || block.timestamp < expiration, "expired");
         for (uint256 i; i < claimIds.length; i++) {
-            require(!_claimed[claimIds[i]], "Already claimed");
+            require(!_claimed[claimIds[i]], "already claimed");
             _claimed[claimIds[i]] = true;
         }
         bytes32 digest = _digest(claimIds, expiration, from, to, claims);
@@ -156,7 +156,7 @@ abstract contract SignedMultiGiveawayBase is
         bytes32 digest,
         Signature[] calldata sigs
     ) internal virtual {
-        require(numberOfSignatures == sigs.length, "invalid sigs");
+        require(numberOfSignatures == sigs.length, "not enough signatures");
         address lastSig = address(0);
         for (uint256 i; i < numberOfSignatures; i++) {
             address signer = _recover(digest, sigs[i]);
@@ -197,7 +197,7 @@ abstract contract SignedMultiGiveawayBase is
     function _hashClaims(ClaimEntry[] calldata claims) internal pure returns (bytes32 hash) {
         bytes32[] memory claimHashes = new bytes32[](claims.length);
         for (uint256 i; i < claims.length; i++) {
-            ClaimEntry memory claimEntry = claims[i];
+            ClaimEntry calldata claimEntry = claims[i];
             claimHashes[i] = keccak256(
                 abi.encode(
                     CLAIM_ENTRY_TYPEHASH,

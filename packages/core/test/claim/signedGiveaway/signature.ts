@@ -2,12 +2,15 @@ import {BigNumber, BigNumberish, Contract} from 'ethers';
 import {Signature} from '@ethersproject/bytes';
 import {ethers} from 'hardhat';
 import {signTypedData_v4} from 'eth-sig-util';
+import {BytesLike, Hexable} from '@ethersproject/bytes/src.ts/index';
 
 export enum TokenType {
   INVALID,
   ERC20,
   ERC721,
+  ERC721_BATCH,
   ERC721_SAFE,
+  ERC721_SAFE_BATCH,
   ERC1155,
   ERC1155_BATCH,
 }
@@ -28,36 +31,53 @@ export function compareClaim(a: Claim[]): (b: ClaimEntry[]) => boolean {
     );
 }
 
-interface ClaimEntryWithContract {
+export interface ClaimEntryWithContract {
   tokenType: TokenType;
   token: Contract;
 }
 
-interface ERC20Claim extends ClaimEntryWithContract {
+// For testing
+export interface InvalidClaim extends ClaimEntryWithContract {
+  tokenType: TokenType.INVALID;
+  data: string;
+}
+
+export interface ERC20Claim extends ClaimEntryWithContract {
   tokenType: TokenType.ERC20;
   amount: BigNumberish;
 }
 
-interface ERC721Claim extends ClaimEntryWithContract {
+export interface ERC721Claim extends ClaimEntryWithContract {
   tokenType: TokenType.ERC721 | TokenType.ERC721_SAFE;
   tokenId: BigNumberish;
 }
 
-interface ERC1155Claim extends ClaimEntryWithContract {
+export interface ERC721BatchClaim extends ClaimEntryWithContract {
+  tokenType: TokenType.ERC721_BATCH | TokenType.ERC721_SAFE_BATCH;
+  tokenIds: BigNumberish[];
+}
+
+export interface ERC1155Claim extends ClaimEntryWithContract {
   tokenType: TokenType.ERC1155;
   amount: BigNumberish;
   tokenId: BigNumberish;
-  data: string;
+  data: BytesLike | Hexable | number;
 }
 
-interface ERC1155BatchClaim extends ClaimEntryWithContract {
+export interface ERC1155BatchClaim extends ClaimEntryWithContract {
   tokenType: TokenType.ERC1155_BATCH;
   amounts: BigNumberish[];
   tokenIds: BigNumberish[];
-  data: string;
+  data: BytesLike | Hexable | number;
 }
 
-export type Claim = ERC20Claim | ERC721Claim | ERC1155Claim | ERC1155BatchClaim;
+export type Claim =
+  | InvalidClaim
+  | ERC20Claim
+  | ERC721Claim
+  | ERC721BatchClaim
+  | ERC1155Claim
+  | ERC1155BatchClaim;
 export const getClaimData = function (claim: Claim): string {
   switch (claim.tokenType) {
     case TokenType.ERC20:
@@ -65,15 +85,25 @@ export const getClaimData = function (claim: Claim): string {
     case TokenType.ERC721:
     case TokenType.ERC721_SAFE:
       return ethers.utils.defaultAbiCoder.encode(['uint256'], [claim.tokenId]);
+    case TokenType.ERC721_BATCH:
+    case TokenType.ERC721_SAFE_BATCH:
+      return ethers.utils.defaultAbiCoder.encode(
+        ['uint256[]'],
+        [claim.tokenIds]
+      );
     case TokenType.ERC1155:
       return ethers.utils.defaultAbiCoder.encode(
-        ['uint256, uint256, bytes'],
-        [claim.tokenId, claim.amount, claim.data]
+        ['uint256', 'uint256', 'bytes'],
+        [
+          claim.tokenId,
+          claim.amount.toString(),
+          ethers.utils.arrayify(claim.data),
+        ]
       );
     case TokenType.ERC1155_BATCH:
       return ethers.utils.defaultAbiCoder.encode(
-        ['uint256[], uint256[], bytes'],
-        [claim.tokenIds, claim.amounts, claim.data]
+        ['uint256[]', 'uint256[]', 'bytes'],
+        [claim.tokenIds, claim.amounts, ethers.utils.arrayify(claim.data)]
       );
     default:
       throw new Error('Invalid type:' + (claim as Claim).tokenType);
@@ -92,7 +122,7 @@ export const signedMultiGiveawaySignature = async function (
   contract: Contract,
   signer: string,
   claimIds: BigNumberish[],
-  expiration: Date | number | null,
+  expiration: number,
   from: string,
   to: string,
   claims: ClaimEntry[],
@@ -142,12 +172,7 @@ export const signedMultiGiveawaySignature = async function (
     },
     message: {
       claimIds: claimIds.map((x) => x.toString()),
-      expiration: (expiration === null
-        ? 0
-        : typeof expiration === 'number'
-        ? expiration
-        : expiration.getTime()
-      ).toString(),
+      expiration,
       from,
       to,
       claims,
