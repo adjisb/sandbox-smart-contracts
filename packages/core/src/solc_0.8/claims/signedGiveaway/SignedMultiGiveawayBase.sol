@@ -13,7 +13,9 @@ import {
     ERC721HolderUpgradeable,
     IERC721ReceiverUpgradeable
 } from "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
-import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import {
+    AccessControlEnumerableUpgradeable
+} from "@openzeppelin/contracts-upgradeable/access/AccessControlEnumerableUpgradeable.sol";
 
 /// @title This contract give rewards in any ERC20, ERC721 or ERC1155 when the backend authorize it via message signing.
 /// @dev The whole contract is split in this base one and implementation to facilitate the reading and split
@@ -24,7 +26,7 @@ abstract contract SignedMultiGiveawayBase is
     EIP712Upgradeable,
     ERC1155HolderUpgradeable,
     ERC721HolderUpgradeable,
-    AccessControlUpgradeable
+    AccessControlEnumerableUpgradeable
 {
     struct Signature {
         uint8 v;
@@ -53,6 +55,7 @@ abstract contract SignedMultiGiveawayBase is
             "Claim(uint256[] claimIds,uint256 expiration,address from,address to,ClaimEntry[] claims)ClaimEntry(uint256 tokenType,address tokenAddress,bytes data)"
         );
 
+    uint256[49] private __preGap;
     /// @dev claimId => true if already claimed
     mapping(uint256 => bool) private _claimed;
 
@@ -61,6 +64,7 @@ abstract contract SignedMultiGiveawayBase is
         __ERC1155Receiver_init_unchained();
         __ERC1155Holder_init_unchained();
         __ERC721Holder_init_unchained();
+        __AccessControlEnumerable_init_unchained();
         __EIP712_init_unchained(name, version);
         __SignedMultiGiveaway_init_unchained();
     }
@@ -73,13 +77,13 @@ abstract contract SignedMultiGiveawayBase is
         public
         view
         virtual
-        override(ERC1155ReceiverUpgradeable, AccessControlUpgradeable)
+        override(ERC1155ReceiverUpgradeable, AccessControlEnumerableUpgradeable)
         returns (bool)
     {
         return
             interfaceId == type(IERC721ReceiverUpgradeable).interfaceId ||
             ERC1155ReceiverUpgradeable.supportsInterface(interfaceId) ||
-            AccessControlUpgradeable.supportsInterface(interfaceId);
+            AccessControlEnumerableUpgradeable.supportsInterface(interfaceId);
     }
 
     /// @notice return true if already claimed
@@ -205,4 +209,6 @@ abstract contract SignedMultiGiveawayBase is
         }
         return keccak256(abi.encodePacked(claimHashes));
     }
+
+    uint256[49] private __postGap;
 }
