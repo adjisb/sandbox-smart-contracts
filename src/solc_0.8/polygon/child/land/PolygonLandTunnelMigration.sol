@@ -7,8 +7,6 @@ import "../../../common/interfaces/IERC721MandatoryTokenReceiver.sol";
 
 /// @title Tunnel migration on L2
 contract PolygonLandTunnelMigration is IERC721MandatoryTokenReceiver {
-    uint256 private constant GRID_SIZE = 408;
-
     struct OwnerWithLandIds {
         address owner;
         uint256[] sizes;
