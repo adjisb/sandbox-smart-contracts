@@ -4,6 +4,8 @@ pragma solidity 0.8.2;
 import "../../../common/interfaces/ILandToken.sol";
 
 /// @title Tunnel migration on L1
+/// @author The Sandbox
+/// @notice Contract handling the migration of LAND tokens from a tunnel to a new one
 contract LandTunnelMigration {
     uint256 private constant GRID_SIZE = 408;
 
@@ -35,6 +37,11 @@ contract LandTunnelMigration {
         emit AdminChanged(_newAdmin);
     }
 
+    /// @notice Constructor of the tunnel migration contract
+    /// @param _landToken LAND token address
+    /// @param _newLandTunnel the tunnel address to migrate to
+    /// @param _oldLandTunnel the tunnel address to migrate from
+    /// @param _admin admin of the contract
     constructor(
         address _landToken,
         address _newLandTunnel,
