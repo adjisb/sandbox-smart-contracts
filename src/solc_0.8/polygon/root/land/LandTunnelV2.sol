@@ -91,6 +91,8 @@ contract LandTunnelV2 is
     /// @param trustedForwarder The new trustedForwarder
     function setTrustedForwarder(address trustedForwarder) external onlyOwner {
         _trustedForwarder = trustedForwarder;
+
+        emit TrustedForwarderSet(trustedForwarder);
     }
 
     /// @dev Pauses all token transfers across bridge
