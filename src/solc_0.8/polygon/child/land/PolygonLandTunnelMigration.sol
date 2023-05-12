@@ -7,7 +7,7 @@ import "../../../common/interfaces/IERC721MandatoryTokenReceiver.sol";
 
 /// @title Tunnel migration on L2
 /// @author The Sandbox
-/// @notice Contract handling the migration of LAND tokens from a tunnel to a new one
+/// @notice contract handling the migration of LAND tokens from a tunnel to a new one
 contract PolygonLandTunnelMigration is IERC721MandatoryTokenReceiver {
     uint256 private constant GRID_SIZE = 408;
 
@@ -47,7 +47,7 @@ contract PolygonLandTunnelMigration is IERC721MandatoryTokenReceiver {
         emit AdminChanged(_newAdmin);
     }
 
-    /// @notice Constructor of the tunnel migration contract
+    /// @notice constructor of the tunnel migration contract
     /// @param _polygonLand LAND token address on the child chain
     /// @param _newLandTunnel tunnel address to migrate to
     /// @param _oldLandTunnel tunnel address to migrate from
