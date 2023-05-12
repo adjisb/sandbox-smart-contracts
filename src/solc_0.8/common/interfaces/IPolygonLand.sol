@@ -5,7 +5,7 @@ import "./ILandToken.sol";
 
 interface IPolygonLand is ILandToken {
     function mintQuad(
-        address user,
+        address to,
         uint256 size,
         uint256 x,
         uint256 y,
